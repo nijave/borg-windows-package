@@ -38,4 +38,4 @@ for p in $(jobs -p); do
 done
 
 zip -9qr dist.zip .
-find . -type d | xargs -r rm -rf
+find . -type d | grep -v "^." | xargs -r rm -rf
