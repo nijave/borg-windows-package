@@ -30,4 +30,4 @@ while read url; do
   rm "${file}"
 done <../urls.txt
 zip -9qr dist.zip .
-find . -type d -exec rm -rf {} \;
+find . -type d -exec rm -rf {} \; || true
