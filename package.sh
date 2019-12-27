@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-pipenv run python -u get_cygwin_links.py | tee urls.txt
+pipenv run python -u get_cygwin_links.py > urls.txt
 
 # tee urls.txt <<EOF
 # http://mirrors.kernel.org/sourceware/cygwin/noarch/release/tzdata/tzdata-2019c-1.tar.xz
