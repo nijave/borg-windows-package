@@ -62,7 +62,8 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: cygwin-dist
-          path: "C:\\dist.zip"
-      - run: |
-          Expand-Archive -Path C:\dist.zip -DestinationPath C:\cygwin64
-        shell: powershell
+          path: .
+      - shell: powershell
+        run: |
+          Get-ChildItem -Recurse | Select FullName
+          Expand-Archive -Path .\dist.zip -DestinationPath .\cygwin64
