@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-which curl
-which tar
 pipenv run python -u get_cygwin_links.py | tee urls.txt
 
 # tee urls.txt <<EOF
@@ -31,5 +29,5 @@ while read url; do
   tar --no-same-owner -xf "${file}"
   rm "${file}"
 done <../urls.txt
-zip -9r dist.zip .
+zip -9qr dist.zip .
 find . -type d -exec rm -rf {} \;
