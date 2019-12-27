@@ -52,10 +52,10 @@ jobs:
     #     asset_name: my-artifact.zip
     #     asset_content_type: application/zip
 
-    setup-borg:
-      runs-on: windows-latest
-      steps:
-        - uses: actions/download-artifact@master
-          with:
-            name: cygwin-dist
-            path: dist.zip
+  setup-borg:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: cygwin-dist
+          path: dist.zip
