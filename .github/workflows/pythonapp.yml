@@ -1,6 +1,9 @@
 name: Package borg and cygwin
 
-on: [push]
+on:
+  push:
+  schedule:
+    - cron: "0 17 * * *"
 
 jobs:
   package-cygwin:
