@@ -62,4 +62,4 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: cygwin-dist
-          path: dist.zip
+          path: "C:\\dist.zip"
