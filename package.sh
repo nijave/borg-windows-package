@@ -24,10 +24,18 @@ mkdir -p dist
 cd dist/
 while read url; do
   echo "Getting $url"
-  curl -O "$url"
-  file="$(basename "$url")"
-  tar --no-same-owner -xf "${file}"
-  rm "${file}"
+  export _url=$url
+  bash <<CMD &
+    curl -sO "\${_url}"
+    file="\$(basename "\${_url}")"
+    tar --no-same-owner -xf "\${file}"
+    rm "\${file}"
+CMD
 done <../urls.txt
+
+for p in $(jobs -p); do
+  wait $p
+done
+
 zip -9qr dist.zip .
-find . -type d -exec rm -rf {} \; || true
+find . -type d | xargs -r rm -rf

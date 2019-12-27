@@ -62,21 +62,15 @@ def resolve_dependencies(item, packages, dependencies=None):
 # Get setup.ini contents
 setup_ini_uri = f"{CYGWIN_MIRROR}x86_64/setup.ini"
 sys.stderr.write(f"Getting package list from {setup_ini_uri}\n")
-response = requests.get(setup_ini_uri)
-package_listing = response.content.decode("utf-8")
-
-sys.stderr.write("Removing newlines in package descriptions\n")
-# Change descriptions back to single lines
-for m in re.finditer(r'(?<=.desc: ")(?:[^"]+)(\n+)(?:[^"]+)(?=")', package_listing):
-    package_listing = (
-        package_listing[: m.start()]
-        + package_listing[m.start() : m.end()].replace("\n", " ")
-        + package_listing[m.end() :]
-    )
+# response = requests.get(setup_ini_uri)
+# package_listing = response.content.decode("utf-8")
+# lines = iter(package_listing.splitlines())
+response = requests.get(setup_ini_uri, stream=True)
+lines = response.iter_lines(decode_unicode=True, chunk_size=2048)
 
 # Generate package listing
 parsing_package = False
-for line in iter(package_listing.splitlines()):
+for line in lines:
     if first(line) == "@":
         parsing_package = line.strip().split(" ", 1)[1]
         # sys.stderr.write(f"Parsing {parsing_package}\n")
@@ -86,12 +80,16 @@ for line in iter(package_listing.splitlines()):
         parsing_package = False
         continue
 
+    if line.startswith('ldesc: "'):
+        while line[-1] != '"':
+            line += next(lines)
+
     if parsing_package:
         attrib = parse_attributes(line)
         PACKAGES[parsing_package][attrib[0]] = attrib[1]
 
 
-sys.stderr.write("Resolving dependencies for 'bash'\n")
+sys.stderr.write("Resolving dependencies\n")
 print(
     "\n".join(
         [
