@@ -96,7 +96,7 @@ print(
     "\n".join(
         [
             f"{CYGWIN_MIRROR}{PACKAGES[dep]['install']['path']}"
-            for dep in resolve_dependencies("bash", PACKAGES)
+            for dep in resolve_dependencies("python3", PACKAGES)
         ]
     )
 )
