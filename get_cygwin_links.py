@@ -79,7 +79,7 @@ parsing_package = False
 for line in iter(package_listing.splitlines()):
     if first(line) == "@":
         parsing_package = line.strip().split(" ", 1)[1]
-        sys.stderr.write(f"Parsing {parsing_package}\n")
+        # sys.stderr.write(f"Parsing {parsing_package}\n")
         continue
 
     if parsing_package and (line == "" or line.startswith("[prev]")):
