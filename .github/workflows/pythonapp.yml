@@ -4,7 +4,6 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -16,7 +15,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip pipenv
-        pipenv install
+        pipenv sync --bare
     - name: Run the script
       run: |
-        pipenv run python get_cygwin_links.py
+        ./package.sh
