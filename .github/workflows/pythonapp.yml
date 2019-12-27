@@ -53,6 +53,7 @@ jobs:
     #     asset_content_type: application/zip
 
   setup-borg:
+    needs: package-cygwin
     runs-on: windows-latest
     steps:
       - uses: actions/download-artifact@master
