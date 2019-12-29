@@ -23,6 +23,7 @@ pipenv run python -u get_cygwin_links.py > urls.txt
 mkdir -p dist
 cd dist/
 rm -rf *
+cp ../build.sh .
 
 echo "Creating directory hierarchy"
 mkdir -p bin
@@ -49,17 +50,17 @@ for p in $(jobs -p); do
   wait $p
 done
 
-echo "Downloading python dependencies"
-mkdir -p vendor
-cd vendor
-pip download -r ../../requirements.txt
+# echo "Downloading python dependencies"
+# mkdir -p vendor
+# cd vendor
+# pip download -r ../../requirements.txt
 
-echo "Replacing Linux wheels with source"
-touch requirements-no-binary.txt
-find . -name "*.whl" | xargs -n 1 basename | grep -vE "none-any.whl$" | grep -Po ".*?(?=-[0-9])" > requirements-no-binary.txt
-pip download --no-binary :all: -r requirements-no-binary.txt
-cat requirements-no-binary.txt | xargs -n 1 -I{} bash -c 'rm {}*.whl'
-cd ..
+# echo "Replacing Linux wheels with source"
+# touch requirements-no-binary.txt
+# find . -name "*.whl" | xargs -n 1 basename | grep -vE "none-any.whl$" | grep -Po ".*?(?=-[0-9])" > requirements-no-binary.txt
+# pip download --no-binary :all: -r requirements-no-binary.txt
+# cat requirements-no-binary.txt | xargs -n 1 -I{} bash -c 'rm {}*.whl'
+# cd ..
 
 echo "Zipping files"
 zip -5qr dist.zip .

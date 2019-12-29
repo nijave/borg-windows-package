@@ -67,3 +67,5 @@ jobs:
         run: |
           Get-ChildItem -Recurse | Select FullName
           Expand-Archive -Path .\dist.zip -DestinationPath .\cygwin64
+          cd .\cygwin64
+          .\bin\bash.exe --login -i build.sh
