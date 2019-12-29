@@ -48,7 +48,9 @@ def parse_attributes(item):
 def resolve_dependencies(item, packages, dependencies=None):
     if dependencies is None:
         dependencies = set()
-    data = packages[item]
+    if item in packages:
+        dependencies.add(item)
+    data = packages.get(item, {})
     for dep in data.get("requires", []) + data.get("depends2", []):
         if dep in dependencies:
             continue
@@ -90,11 +92,24 @@ for line in lines:
 
 
 sys.stderr.write("Resolving dependencies\n")
+required_packages = set()
+BASE_REQUIREMENTS = ["cygwin-devel", "gcc-g++", "libssl-devel", "python36-devel"]
+BUILD_REQUIREMENTS = ["python36", "python36-pip"]
+# for package in BASE_REQUIREMENTS:
+for package in BASE_REQUIREMENTS + BUILD_REQUIREMENTS:
+    reqs = resolve_dependencies(package, PACKAGES)
+    sys.stderr.write(f"Found {package} requires {str(reqs)}\n")
+    required_packages.update(reqs)
+
+# sys.stderr.write(f"Will download {required_packages}\n")
+# for dep in required_packages:
+#     sys.stderr.write(f"{dep} {PACKAGES.get(dep).get('install', {}).get('path', '')}\n")
+
 print(
     "\n".join(
         [
             f"{CYGWIN_MIRROR}{PACKAGES[dep]['install']['path']}"
-            for dep in resolve_dependencies("python3", PACKAGES)
+            for dep in required_packages
         ]
     )
 )

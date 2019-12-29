@@ -22,20 +22,46 @@ pipenv run python -u get_cygwin_links.py > urls.txt
 
 mkdir -p dist
 cd dist/
+rm -rf *
+
+echo "Creating directory hierarchy"
+mkdir -p bin
+mkdir -p lib
+mkdir -p home
+mkdir -p tmp
+mkdir -p usr
+ln -s ../bin usr/bin
+ln -s ../lib usr/lib
+
 while read url; do
   echo "Getting $url"
   export _url=$url
   bash <<CMD &
     curl -sO "\${_url}"
     file="\$(basename "\${_url}")"
-    tar --no-same-owner -xf "\${file}"
+    tar --no-same-owner -hxf "\${file}"
     rm "\${file}"
 CMD
 done <../urls.txt
 
+echo "Waiting for downloads to finish"
 for p in $(jobs -p); do
   wait $p
 done
 
-zip -9qr dist.zip .
-find . -type d | grep -v "^." | xargs -r rm -rf
+echo "Downloading python dependencies"
+mkdir -p vendor
+cd vendor
+pip download -r ../../requirements.txt
+
+echo "Replacing Linux wheels with source"
+touch requirements-no-binary.txt
+find . -name "*.whl" | xargs -n 1 basename | grep -vE "none-any.whl$" | grep -Po ".*?(?=-[0-9])" > requirements-no-binary.txt
+pip download --no-binary :all: -r requirements-no-binary.txt
+cat requirements-no-binary.txt | xargs -n 1 -I{} bash -c 'rm {}*.whl'
+cd ..
+
+echo "Zipping files"
+zip -5qr dist.zip .
+
+# find . -type d | grep -v "^." | xargs -r rm -rf
