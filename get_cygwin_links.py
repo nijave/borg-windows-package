@@ -93,10 +93,13 @@ for line in lines:
 
 sys.stderr.write("Resolving dependencies\n")
 required_packages = set()
-BASE_REQUIREMENTS = ["cygwin-devel", "gcc-g++", "libssl-devel", "python36-devel"]
+ALL_REQUIREMENTS = ["cygwin-devel", "gcc-g++", "libssl-devel", "python36-devel"]
 BUILD_REQUIREMENTS = ["python36", "python36-pip"]
-# for package in BASE_REQUIREMENTS:
-for package in BASE_REQUIREMENTS + BUILD_REQUIREMENTS:
+
+if len(sys.argv) > 0 and sys.argv[0] == "BUILD":
+    ALL_REQUIREMENTS += BUILD_REQUIREMENTS
+
+for package in ALL_REQUIREMENTS:
     reqs = resolve_dependencies(package, PACKAGES)
     sys.stderr.write(f"Found {package} requires {str(reqs)}\n")
     required_packages.update(reqs)
