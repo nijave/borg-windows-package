@@ -66,10 +66,10 @@ jobs:
         run: |
           Expand-Archive -Path .\dist.zip -DestinationPath .\cygwin64
       - name: Build borgbackup wheel
-        shell: powershell
+        shell: cmd
         run: |
           cd .\cygwin64
-          .\bin\bash.exe --login -i build.sh
+          .\bin\bash.exe build.sh
       - name: Upload borgbackup wheel
         uses: actions/upload-artifact@master
         with:
