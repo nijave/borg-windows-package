@@ -38,5 +38,5 @@ jobs:
       - name: Upload borgbackup wheel
         uses: actions/upload-artifact@master
         with:
-          name: borgbackup-build
+          name: ${{ steps.build-whl.outputs.version }}
           path: ${{ steps.build-whl.outputs.whl }}
