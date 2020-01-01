@@ -26,7 +26,7 @@ jobs:
           C:\tools\cygwin\cygwinsetup.exe -nqWgv `
               -s http://mirrors.kernel.org/sourceware/cygwin/ `
               -R C:\tools\cygwin `
-              -P cygwin-devel,gcc-g++,libssl-devel,python37,python37-pip,python37-devel | Out-String
+              -P cygwin-devel,gcc-g++,libssl-devel,python38,python38-pip,python38-devel | Out-String
           Write-Output $?
 
       - name: Build borgbackup wheel
