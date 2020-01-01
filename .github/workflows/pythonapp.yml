@@ -39,4 +39,26 @@ jobs:
         uses: actions/upload-artifact@master
         with:
           name: ${{ steps.build-whl.outputs.version }}
-          path: ${{ steps.build-whl.outputs.whl }}
+          path: ${{ steps.build-whl.outputs.whl_path }}
+      
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.build-whl.outputs.borg_version }}
+          release_name: ${{ steps.build-whl.outputs.version }}
+          draft: false
+          prerelease: false
+
+      - name: Upload release artifact
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.build-whl.outputs.whl_path }}
+          asset_name: ${{ steps.build-whl.outputs.whl_name }}
+          asset_content_type: application/zip
