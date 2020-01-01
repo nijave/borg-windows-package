@@ -6,90 +6,37 @@ on:
     - cron: "0 17 * * *"
 
 jobs:
-  package-cygwin-build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip pipenv
-        pipenv sync --bare
-
-    - name: Run packaging script
-      run: |
-        ./package.sh BUILD
-
-    - name: Upload cygwin dist artifact
-      uses: actions/upload-artifact@master
-      with:
-        name: cygwin-build
-        path: dist/dist.zip
-
-    # - name: Create release
-    #   id: create_release
-    #   uses: actions/create-release@v1
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   with:
-    #     tag_name: ${{ github.ref }}
-    #     release_name: ${{ github.ref }}
-    #     body: |
-    #       Test
-    #     draft: false
-    #     prerelease: true
-    
-    # - name: Upload Release Asset
-    #   id: upload-release-asset 
-    #   uses: actions/upload-release-asset@v1.0.1
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   with:
-    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-    #     asset_path: ./dist.zip
-    #     asset_name: my-artifact.zip
-    #     asset_content_type: application/zip
-
   build-borg:
-    needs: package-cygwin-build
     runs-on: windows-latest
     steps:
-      - uses: actions/download-artifact@master
-        with:
-          name: cygwin-build
-          path: .
-      - name: Extract build environment
-        shell: powershell
+      - uses: actions/checkout@master
+
+      - name: Install cygwin base
         run: |
-          Expand-Archive -Path .\dist.zip -DestinationPath .\cygwin64
+          choco config get cacheLocation
+          For ($i = 0; $i -le 3; $i++) {
+            choco install --no-progress cygwin
+            If($?) {
+              break
+            }
+          }
+
+      - name: Install cygwin borgbackup reqs
+        run: |
+          C:\tools\cygwin\cygwinsetup.exe -nqWgv `
+              -s http://mirrors.kernel.org/sourceware/cygwin/ `
+              -R C:\tools\cygwin `
+              -P cygwin-devel,gcc-g++,libssl-devel,python36,python36-pip,python36-devel | Out-String
+          Write-Output $?
+
       - name: Build borgbackup wheel
-        shell: cmd
+        id: build-whl
         run: |
-          cd .\cygwin64
-          .\bin\bash.exe build.sh
+          dos2unix "$(pwd)\build.sh"
+          C:\tools\cygwin\bin\bash.exe --login "$(pwd)\build.sh"
+
       - name: Upload borgbackup wheel
         uses: actions/upload-artifact@master
         with:
           name: borgbackup-build
-          path: cygwin64/borgbackup*/dist/*.whl
-
-  package-cygwin-run:
-    needs: build-borg
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-python@v1
-        with:
-          python-version: 3.7
-  
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip pipenv
-          pipenv sync --bare
-  
-      - name: Run packaging script
-        run: |
-          ./package.sh RUN
+          path: ${{ steps.build-whl.outputs.whl }}

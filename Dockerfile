@@ -10,7 +10,7 @@ WORKDIR /borg-windows-package
 COPY Pipfile* ./
 RUN pipenv sync --bare 
 
-COPY requirements.txt get_cygwin_links.py package.sh ./
+COPY requirements.txt get_cygwin_links.py package.sh build.sh ./
 
 # mkdir -p dist/ && chcon -Rt fusefs_t dist/
 CMD /borg-windows-package/package.sh

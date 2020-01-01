@@ -63,6 +63,7 @@ done
 # cd ..
 
 echo "Zipping files"
-zip -5qr dist.zip .
+# zip -5qr dist.zip .
+tar acf dist.tar.gz .
 
 # find . -type d | grep -v "^." | xargs -r rm -rf
