@@ -2,7 +2,7 @@
 
 set -e
 
-export PYTHON=python3
+export PYTHON=$(ls /usr/bin | grep -P "^python3\.[0-9]+$" | sort -r | head -n 1)
 export PATH=/usr/bin:$PATH
 $PYTHON -m ensurepip
 $PYTHON -m pip install -U pip wheel
