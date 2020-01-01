@@ -2,7 +2,7 @@
 
 set -e
 
-export PYTHON=python3.6
+export PYTHON=python3
 export PATH=/usr/bin:$PATH
 $PYTHON -m ensurepip
 $PYTHON -m pip install -U pip wheel
