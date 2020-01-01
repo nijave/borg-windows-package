@@ -26,7 +26,8 @@ jobs:
           C:\tools\cygwin\cygwinsetup.exe -nqWgv `
               -s http://mirrors.kernel.org/sourceware/cygwin/ `
               -R C:\tools\cygwin `
-              -P cygwin-devel,gcc-g++,libssl-devel,python36,python36-pip,python36-devel | Out-String
+              -P cygwin-devel,gcc-g++,libssl-devel,python37-pip,python37-devel `
+                | Out-String
           Write-Output $?
 
       - name: Build borgbackup wheel
@@ -44,10 +45,11 @@ jobs:
       - name: Create release
         id: create_release
         uses: actions/create-release@master
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.build-whl.outputs.borg_version }}
+          tag_name: ${{ steps.build-whl.outputs.version }}
           release_name: ${{ steps.build-whl.outputs.version }}
           draft: false
           prerelease: false
@@ -55,6 +57,7 @@ jobs:
       - name: Upload release artifact
         id: upload-release-asset 
         uses: actions/upload-release-asset@master
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
