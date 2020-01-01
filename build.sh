@@ -12,6 +12,6 @@ cd $(find . -maxdepth 1 -name "borgbackup*" -type d | tail -n 1 | xargs basename
 $PYTHON setup.py bdist_wheel
 
 whl=$(find . -name "*.whl" | head -n 1)
-echo "::set-output name=whl::$( cygpath -w $(readlink -f ${whl}))"
+echo "::set-output name=whl::$(cygpath -w $(readlink -f ${whl}))"
 
 exit 0
