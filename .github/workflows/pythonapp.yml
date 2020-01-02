@@ -11,6 +11,22 @@ jobs:
     steps:
       - uses: actions/checkout@master
 
+      - uses: actions/setup-python@master
+        with:
+          python-version: 3.x
+          architecture: x64
+      
+      - name: Get latest python version on cygwin
+        id: cygwin_python_version
+        run: |
+          pip install requests
+          @'
+          from cygwin import get_packages, latest_python3, output_latest
+          output_latest(
+            latest_python3(get_packages())
+          )
+          '@ | python
+
       - name: Install cygwin base
         run: |
           choco config get cacheLocation
@@ -26,7 +42,7 @@ jobs:
           C:\tools\cygwin\cygwinsetup.exe -nqWgv `
               -s http://mirrors.kernel.org/sourceware/cygwin/ `
               -R C:\tools\cygwin `
-              -P cygwin-devel,gcc-g++,libssl-devel,python37-pip,python37-devel `
+              -P cygwin-devel,gcc-g++,libssl-devel,${{ steps.cygwin_python_version.outputs.version }}-pip,${{ steps.cygwin_python_version.outputs.version }}-devel `
                 | Out-String
           Write-Output $?
 
