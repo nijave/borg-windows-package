@@ -70,8 +70,8 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload release artifact
-        id: upload-release-asset 
+      - name: Upload borgbackup wheel
+        id: upload-whl-asset 
         uses: actions/upload-release-asset@master
         continue-on-error: true
         env:
@@ -81,3 +81,15 @@ jobs:
           asset_path: ${{ steps.build-whl.outputs.whl_path }}
           asset_name: ${{ steps.build-whl.outputs.whl_name }}
           asset_content_type: application/zip
+
+      - name: Upload install script
+        id: upload-script-asset 
+        uses: actions/upload-release-asset@master
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.build-whl.outputs.script_path }}
+          asset_name: install.ps1
+          asset_content_type: text/plain
