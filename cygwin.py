@@ -18,6 +18,9 @@ PARSERS["source"] = PARSERS["install"]
 
 
 def first(item):
+    """
+    Safely grab the first item from a list
+    """
     try:
         return item[0]
     except IndexError:
@@ -44,6 +47,9 @@ def parse_attributes(item):
 
 
 def resolve_dependencies(item, packages, dependencies=None):
+    """
+    Recursively determine dependency tree for package
+    """
     if dependencies is None:
         dependencies = set()
     if item in packages:
@@ -60,13 +66,15 @@ def resolve_dependencies(item, packages, dependencies=None):
 
 
 def get_packages(cygwin_mirror=CYGWIN_MIRROR):
+    """
+    Gets Cygwin package listing and parses into a dict
+    of packages
+    """
     packages = defaultdict(dict)
+
     # Get setup.ini contents
-    setup_ini_uri = f"{CYGWIN_MIRROR}x86_64/setup.ini"
+    setup_ini_uri = f"{cygwin_mirror}x86_64/setup.ini"
     sys.stderr.write(f"Getting package list from {setup_ini_uri}\n")
-    # response = requests.get(setup_ini_uri)
-    # package_listing = response.content.decode("utf-8")
-    # lines = iter(package_listing.splitlines())
     response = requests.get(setup_ini_uri, stream=True)
     lines = response.iter_lines(decode_unicode=True, chunk_size=2048)
 
@@ -75,7 +83,6 @@ def get_packages(cygwin_mirror=CYGWIN_MIRROR):
     for line in lines:
         if first(line) == "@":
             parsing_package = line.strip().split(" ", 1)[1]
-            # sys.stderr.write(f"Parsing {parsing_package}\n")
             continue
 
         if parsing_package and (line == "" or line.startswith("[prev]")):
@@ -94,6 +101,10 @@ def get_packages(cygwin_mirror=CYGWIN_MIRROR):
 
 
 def latest_python3(packages):
+    """
+    Find the latest python version from
+    the package dict
+    """
     python = {
         version: details
         for version, details in packages.items()
@@ -104,14 +115,19 @@ def latest_python3(packages):
 
 
 def output_latest(version):
+    """
+    Output the version that Github Actions
+    will register as an output
+    """
     print("Setting version to " + version)
     print("::set-output name=version::" + version)
 
 
+# Prints out links for a list of packages after dependencies are resolved
 if __name__ == "__main__":
     PACKAGES = get_packages()
     sys.stderr.write("Resolving dependencies\n")
-    required_packages = set()
+    REQUIRED_PACKAGES = set()
     ALL_REQUIREMENTS = ["cygwin-devel", "gcc-g++", "libssl-devel", "python36-devel"]
     BUILD_REQUIREMENTS = ["python36", "python36-pip"]
 
@@ -121,17 +137,13 @@ if __name__ == "__main__":
     for package in ALL_REQUIREMENTS:
         reqs = resolve_dependencies(package, PACKAGES)
         sys.stderr.write(f"Found {package} requires {str(reqs)}\n")
-        required_packages.update(reqs)
-
-    # sys.stderr.write(f"Will download {required_packages}\n")
-    # for dep in required_packages:
-    #     sys.stderr.write(f"{dep} {PACKAGES.get(dep).get('install', {}).get('path', '')}\n")
+        REQUIRED_PACKAGES.update(reqs)
 
     print(
         "\n".join(
             [
                 f"{CYGWIN_MIRROR}{PACKAGES[dep]['install']['path']}"
-                for dep in required_packages
+                for dep in REQUIRED_PACKAGES
             ]
         )
     )

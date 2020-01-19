@@ -17,7 +17,7 @@ $PYTHON setup.py bdist_wheel
 
 whl=$(find . -name "*.whl" | head -n 1)
 
-cat <<<EOF > install.ps1
+cat << EOF > install.ps1
 #TODO Install choco
 Start-Process -Verb runAs powershell -ArgumentList "-Command" "& $(Invoke-WebRequest -UseBasicParsing -Uri https://choco-install-url).Content"
 
