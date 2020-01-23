@@ -15,11 +15,12 @@ cd $(find . -maxdepth 1 -name "borgbackup*" -type d | tail -n 1 | xargs basename
 export BORG_VERSION=$($PYTHON setup.py --version)
 $PYTHON setup.py bdist_wheel
 
-whl=$(find . -name "*.whl" | head -n 1)
+RELEASE_TAG="cyg${CYGWIN_VERSION}-py${PYTHON_VERSION}-borg${BORG_VERSION}"
+WHL=$(find . -name "*.whl" | head -n 1)
 
 cat << EOF > install.ps1
-#TODO Install choco
-Start-Process -Verb runAs powershell -ArgumentList "-Command" "& $(Invoke-WebRequest -UseBasicParsing -Uri https://choco-install-url).Content"
+Start-Process -Verb runAs powershell -ArgumentList "-NoProfile", "-ExecutionPolicy", "AllSigned",
+    "-Command", "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))" && SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
 
 Start-Process -Verb runAs "c:\ProgramData\chocolatey\bin\choco.exe" -ArgumentList "install", "cygwin"
 
@@ -28,15 +29,14 @@ Start-Process -Verb -runAs "C:\tools\cygwin\cygwinsetup.exe" -ArgumentList "-nqW
     "-R", "C:\tools\cygwin",
     "-P", "${PYTHON_VERSION}-pip" | Out-String
 
-# TODO release path
-Start-Process "c:\tools\cygwin\bin\bash.exe" -ArgumentList "--login", 
-    "-c", "pip install -y https://github.com/nijave/borg-windows-package/releases/${whl} borgmatic"
+Start-Process "c:\tools\cygwin\bin\bash.exe" -ArgumentList "--login",
+    "-c", "pip install -y https://github.com/nijave/borg-windows-package/releases/download/${RELEASE_TAG}/$(basename ${WHL}) borgmatic"
 EOF
 
 echo "::set-output name=borg_version::${BORG_VERSION}"
-echo "::set-output name=version::cyg${CYGWIN_VERSION}-py${PYTHON_VERSION}-borg${BORG_VERSION}"
-echo "::set-output name=whl_name::$(basename ${whl})"
-echo "::set-output name=whl_path::$(cygpath -w $(readlink -f ${whl}))"
+echo "::set-output name=version::${RELEASE_TAG}"
+echo "::set-output name=whl_name::$(basename ${WHL})"
+echo "::set-output name=whl_path::$(cygpath -w $(readlink -f ${WHL}))"
 echo "::set-output name=script_path::$(cygpath -w $(readlink -f install.ps1))"
 
 exit 0
