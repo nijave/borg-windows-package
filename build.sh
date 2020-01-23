@@ -19,17 +19,19 @@ RELEASE_TAG="cyg${CYGWIN_VERSION}-py${PYTHON_VERSION}-borg${BORG_VERSION}"
 WHL=$(find . -name "*.whl" | head -n 1)
 
 cat << EOF > install.ps1
-Start-Process -Verb runAs powershell -ArgumentList "-NoProfile", "-ExecutionPolicy", "AllSigned",
-    "-Command", "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))" && SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
+Start-Process -Verb runAs -Wait powershell -ArgumentList "-NoProfile", "-ExecutionPolicy", "AllSigned",
+    "-Command", "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
 
-Start-Process -Verb runAs "c:\ProgramData\chocolatey\bin\choco.exe" -ArgumentList "install", "cygwin"
+$env:PATH = "$env:PATH;$env:ALLUSERSPROFILE\chocolatey\bin"
 
-Start-Process -Verb -runAs "C:\tools\cygwin\cygwinsetup.exe" -ArgumentList "-nqWgv",
+Start-Process -Verb runAs -Wait "c:\ProgramData\chocolatey\bin\choco.exe" -ArgumentList "install", "cygwin"
+
+Start-Process -Verb -runAs -Wait "C:\tools\cygwin\cygwinsetup.exe" -ArgumentList "-nqWgv",
     "-s", "http://mirrors.kernel.org/sourceware/cygwin/",
     "-R", "C:\tools\cygwin",
-    "-P", "${PYTHON_VERSION}-pip" | Out-String
+    "-P", "${CYGWIN_PYTHON_PACKAGE}-pip" | Out-String
 
-Start-Process "c:\tools\cygwin\bin\bash.exe" -ArgumentList "--login",
+Start-Process -Wait "c:\tools\cygwin\bin\bash.exe" -ArgumentList "--login",
     "-c", "pip install -y https://github.com/nijave/borg-windows-package/releases/download/${RELEASE_TAG}/$(basename ${WHL}) borgmatic"
 EOF
 

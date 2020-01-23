@@ -48,6 +48,8 @@ jobs:
 
       - name: Build borgbackup wheel
         id: build-whl
+        env:
+          CYGWIN_PYTHON_PACKAGE: ${{ steps.cygwin_python_version.outputs.version }}
         run: |
           dos2unix "$(pwd)\build.sh"
           C:\tools\cygwin\bin\bash.exe --login "$(pwd)\build.sh"
@@ -57,6 +59,12 @@ jobs:
         with:
           name: ${{ steps.build-whl.outputs.version }}
           path: ${{ steps.build-whl.outputs.whl_path }}
+      
+      - name: Upload install script
+        uses: actions/upload-artifact@master
+        with:
+          name: install.ps1
+          path: ${{ steps.build-whl.outputs.script_path }}
       
       - name: Create release
         id: create_release
