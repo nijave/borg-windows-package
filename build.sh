@@ -22,11 +22,11 @@ cat << EOF > install.ps1
 Start-Process -Verb runAs -Wait powershell -ArgumentList "-NoProfile", "-ExecutionPolicy", "AllSigned",
     "-Command", "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
 
-$env:PATH = "$env:PATH;$env:ALLUSERSPROFILE\chocolatey\bin"
+\$env:PATH = "\$env:PATH;\$env:ALLUSERSPROFILE\chocolatey\bin"
 
 Start-Process -Verb runAs -Wait "c:\ProgramData\chocolatey\bin\choco.exe" -ArgumentList "install", "cygwin"
 
-Start-Process -Verb -runAs -Wait "C:\tools\cygwin\cygwinsetup.exe" -ArgumentList "-nqWgv",
+Start-Process -Verb runAs -Wait "C:\tools\cygwin\cygwinsetup.exe" -ArgumentList "-nqWgv",
     "-s", "http://mirrors.kernel.org/sourceware/cygwin/",
     "-R", "C:\tools\cygwin",
     "-P", "${CYGWIN_PYTHON_PACKAGE}-pip" | Out-String
