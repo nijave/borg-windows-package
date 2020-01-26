@@ -31,8 +31,15 @@ Start-Process -Verb runAs -Wait "C:\tools\cygwin\cygwinsetup.exe" -ArgumentList 
     "-R", "C:\tools\cygwin",
     "-P", "${CYGWIN_PYTHON_PACKAGE}-pip" | Out-String
 
-Start-Process -Wait "c:\tools\cygwin\bin\bash.exe" -ArgumentList "--login",
-    "-c", "pip install -y https://github.com/nijave/borg-windows-package/releases/download/${RELEASE_TAG}/$(basename ${WHL}) borgmatic"
+@'
+    PYTHON=\$(find /usr/bin -name "python*.exe" | head -n 1)
+    PIP=\$(find /usr/bin -name "pip*.*" | head -n 1)
+    ln -s "\$PYTHON" /usr/bin/python
+    ln -s "\$PYTHON" /usr/bin/python3
+    ln -s "\$PIP" /usr/bin/pip
+    ln -s "\$PIP" /usr/bin/pip3
+    pip3 install https://github.com/nijave/borg-windows-package/releases/download/${RELEASE_TAG}/$(basename ${WHL}) borgmatic
+'@ | & "c:\tools\cygwin\bin\bash.exe" --login -i
 EOF
 
 echo "::set-output name=borg_version::${BORG_VERSION}"
