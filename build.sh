@@ -29,7 +29,7 @@ Start-Process -Verb runAs -Wait "c:\ProgramData\chocolatey\bin\choco.exe" -Argum
 Start-Process -Verb runAs -Wait "C:\tools\cygwin\cygwinsetup.exe" -ArgumentList "-nqWgv",
     "-s", "http://mirrors.kernel.org/sourceware/cygwin/",
     "-R", "C:\tools\cygwin",
-    "-P", "${CYGWIN_PYTHON_PACKAGE}-pip" | Out-String
+    "-P", "${CYGWIN_PYTHON_PACKAGE}-pip,gcc-core,openssh,zstd" | Out-String
 
 @'
     PYTHON=\$(find /usr/bin -name "python*.exe" | head -n 1)
