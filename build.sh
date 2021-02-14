@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -xe
 
 # export PATH=/usr/bin:$PATH
 export PYTHON=$(ls /usr/bin | grep -P "^python3\.[0-9]+m?\.exe$" | sort -r | head -n 1)
