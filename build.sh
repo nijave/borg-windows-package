@@ -7,7 +7,7 @@ export PYTHON=$(ls /usr/bin | grep -P "^python3\.[0-9]+m?\.exe$" | sort -r | hea
 export PYTHON_VERSION=$($PYTHON --version | awk '{print $2}')
 export CYGWIN_VERSION=$(cygcheck -V | head -n 1 | grep -Po "[0-9.]+")
 
-$PYTHON -m ensurepip
+# $PYTHON -m ensurepip
 $PYTHON -m pip install -U pip wheel
 $PYTHON -m pip download borgbackup
 tar xf borgbackup*.tar.*
