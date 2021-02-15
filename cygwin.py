@@ -128,8 +128,8 @@ if __name__ == "__main__":
     PACKAGES = get_packages()
     sys.stderr.write("Resolving dependencies\n")
     REQUIRED_PACKAGES = set()
-    ALL_REQUIREMENTS = ["cygwin-devel", "gcc-g++", "libssl-devel", "python36-devel"]
-    BUILD_REQUIREMENTS = ["python36", "python36-pip"]
+    ALL_REQUIREMENTS = ["cygwin-devel", "gcc-g++", "libssl-devel", "python38-devel"]
+    BUILD_REQUIREMENTS = ["python38", "python38-pip"]
 
     if len(sys.argv) > 0 and sys.argv[0] == "BUILD":
         ALL_REQUIREMENTS += BUILD_REQUIREMENTS
