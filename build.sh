@@ -15,18 +15,27 @@ function build_wheel {
     $PYTHON -m pip download "$package"
     tar xf $package*.tar.*
     pushd $(find . -maxdepth 1 -name "$package*" -type d | tail -n 1 | xargs basename)
-    if [ "$package" == "borgbackup" ]; then
-        export BORG_VERSION=$($PYTHON setup.py --version)
-    fi
+    
     $PYTHON setup.py bdist_wheel
+    
+    WHL=$(find . -name "*.whl" | head -n 1)
+    
+    if [ "$package" == "borgbackup" ]; then
+        export BORG_VERSION="$($PYTHON setup.py --version)"
+        export RELEASE_TAG="cyg${CYGWIN_VERSION}-py${PYTHON_VERSION}-borg${BORG_VERSION}"
+        export BORGBACKUP_WHL="$WHL"
+        echo "::set-output name=borg_version::${BORG_VERSION}"
+        echo "::set-output name=version::${RELEASE_TAG}"
+    fi
+
+    echo "::set-output name=whl_$package_name::$(basename ${WHL})"
+    echo "::set-output name=whl_$package_path::$(cygpath -w $(readlink -f ${WHL}))"
+
     popd
 }
 
 build_wheel borgbackup
 build_wheel ruamel.yaml.clib
-
-RELEASE_TAG="cyg${CYGWIN_VERSION}-py${PYTHON_VERSION}-borg${BORG_VERSION}"
-WHL=$(find . -name "*.whl" | head -n 1)
 
 cat << EOF > install.ps1
 Start-Process -Verb runAs -Wait powershell -ArgumentList "-NoProfile", "-ExecutionPolicy", "AllSigned",
@@ -48,14 +57,10 @@ Start-Process -Verb runAs -Wait "C:\tools\cygwin\cygwinsetup.exe" -ArgumentList 
     ln -s "\$PYTHON" /usr/bin/python3
     ln -s "\$PIP" /usr/bin/pip
     ln -s "\$PIP" /usr/bin/pip3
-    pip3 install https://github.com/nijave/borg-windows-package/releases/download/${RELEASE_TAG}/$(basename ${WHL}) borgmatic
+    pip3 install https://github.com/nijave/borg-windows-package/releases/download/${RELEASE_TAG}/$(basename ${BORGBACKUP_WHL}) borgmatic
 '@ | & "c:\tools\cygwin\bin\bash.exe" --login -i
 EOF
 
-echo "::set-output name=borg_version::${BORG_VERSION}"
-echo "::set-output name=version::${RELEASE_TAG}"
-echo "::set-output name=whl_name::$(basename ${WHL})"
-echo "::set-output name=whl_path::$(cygpath -w $(readlink -f ${WHL}))"
 echo "::set-output name=script_path::$(cygpath -w $(readlink -f install.ps1))"
 
 exit 0
