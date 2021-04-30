@@ -58,8 +58,14 @@ jobs:
         uses: actions/upload-artifact@master
         with:
           name: ${{ steps.build-whl.outputs.version }}
-          path: ${{ steps.build-whl.outputs.whl_path }}
-      
+          path: ${{ steps.build-whl.outputs.whl_borgbackup_path }}
+  
+      - name: Upload ruamel.yaml.clib wheel
+        uses: actions/upload-artifact@master
+        with:
+          name: ${{ steps.build-whl.outputs.whl_ruamel.yaml.clib_name }}
+          path: ${{ steps.build-whl.outputs.whl_ruamel.yaml.clib_path }}
+  
       - name: Upload install script
         uses: actions/upload-artifact@master
         with:
