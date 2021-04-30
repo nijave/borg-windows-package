@@ -9,11 +9,21 @@ export CYGWIN_VERSION=$(cygcheck -V | head -n 1 | grep -Po "[0-9.]+")
 
 # $PYTHON -m ensurepip
 $PYTHON -m pip install -U pip wheel
-$PYTHON -m pip download borgbackup
-tar xf borgbackup*.tar.*
-cd $(find . -maxdepth 1 -name "borgbackup*" -type d | tail -n 1 | xargs basename)
-export BORG_VERSION=$($PYTHON setup.py --version)
-$PYTHON setup.py bdist_wheel
+
+function build_wheel {
+    package=$1
+    $PYTHON -m pip download "$package"
+    tar xf $package*.tar.*
+    pushd $(find . -maxdepth 1 -name "$package*" -type d | tail -n 1 | xargs basename)
+    if [ "$package" == "borgbackup" ]; then
+        export BORG_VERSION=$($PYTHON setup.py --version)
+    fi
+    $PYTHON setup.py bdist_wheel
+    popd
+}
+
+build_wheel borgbackup
+build_wheel ruamel.yaml.clib
 
 RELEASE_TAG="cyg${CYGWIN_VERSION}-py${PYTHON_VERSION}-borg${BORG_VERSION}"
 WHL=$(find . -name "*.whl" | head -n 1)
