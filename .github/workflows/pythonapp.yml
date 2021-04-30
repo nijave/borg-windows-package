@@ -63,7 +63,7 @@ jobs:
       - name: Upload ruamel.yaml.clib wheel
         uses: actions/upload-artifact@master
         with:
-          name: ${{ steps.build-whl.outputs.version }}
+          name: ${{ steps.build-whl.outputs.whl_ruamel.yaml.clib_name }}
           path: ${{ steps.build-whl.outputs.whl_ruamel.yaml.clib_path }}
   
       - name: Upload install script
