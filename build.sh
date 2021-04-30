@@ -43,7 +43,7 @@ Start-Process -Verb runAs -Wait powershell -ArgumentList "-NoProfile", "-Executi
 
 \$env:PATH = "\$env:PATH;\$env:ALLUSERSPROFILE\chocolatey\bin"
 
-Start-Process -Verb runAs -Wait "c:\ProgramData\chocolatey\bin\choco.exe" -ArgumentList "install", "cygwin"
+Start-Process -Verb runAs -Wait "c:\ProgramData\chocolatey\bin\choco.exe" -ArgumentList "install", "-y", "cygwin"
 
 Start-Process -Verb runAs -Wait "C:\tools\cygwin\cygwinsetup.exe" -ArgumentList "-nqWgv",
     "-s", "http://mirrors.kernel.org/sourceware/cygwin/",
